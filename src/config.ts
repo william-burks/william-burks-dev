@@ -1,0 +1,23 @@
+export const SITE = {
+  website: "https://william-burks.dev/",
+  author: "Will Burks",
+  profile: "https://william-burks.dev/",
+  desc: "Notes on systematic trading infrastructure, AI agents, and low-latency systems.",
+  title: "Will Burks",
+  ogImage: "astropaper-og.jpg",
+  lightAndDarkMode: true,
+  postPerIndex: 4,
+  postPerPage: 4,
+  scheduledPostMargin: 15 * 60 * 1000,
+  showArchives: true,
+  showBackButton: true,
+  editPost: {
+    enabled: false,
+    text: "Edit page",
+    url: "https://github.com/Burkswill2/william-burks-dev/edit/main/",
+  },
+  dynamicOgImage: true,
+  dir: "ltr",
+  lang: "en",
+  timezone: "America/New_York",
+} as const;
