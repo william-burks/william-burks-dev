@@ -8,8 +8,13 @@ tags:
   - ai-agents
   - claude-code
   - reliability
-description: "Two weeks of running my own Claude Code agents, ~60 audited runs, and a -11pp cut in wasted tool calls. What moved the number wasn't better prompts."
+ogImage: "../../assets/images/doNotCross.png"
+description: "The PreToolUse hook is a line agents can't cross. Prose rules ask the agent to behave; deny lists make the misbehavior physically impossible."
 ---
+
+![Orange construction caution tape reading "DO NOT CROSS" stretched across a boundary.](@/assets/images/doNotCross.png)
+
+*The PreToolUse hook is a line agents cannot cross. That's the move. Prose rules ask the agent to behave; deny lists make the misbehavior physically impossible. Photo by [Andrej Lišakov](https://unsplash.com/@lishakov) on Unsplash.*
 
 I spent two weeks instrumenting the agents that do QA work on my personal
 trading research repo. Every tool call is logged. Every run is audited by
@@ -46,31 +51,19 @@ pattern got shorter and *which* fix closed it.
 
 ## The trend
 
-Waste % averaged across epic, QA agent only:
+![Table of QA waste percentage by epic, showing the drop from the 27–32% band down to a 16–20% floor across epics 9.5, 10, and 10b.](@/assets/images/trendTable.png)
 
-| Epic | Calls (total range) | Waste % | Dominant pattern |
-|------|---------------------|---------|------------------|
-| 6 (12 runs) | 32–67 | ~27% avg, 67% peak | file-reread, grep-storm |
-| 7 | 53 | 30% | grep-storm |
-| 9HF | 32–36 | 31–33% | grep-storm, unlisted-tests |
-| **9.5** | 45 | **16%** | scope-archaeology |
-| **10** | 71 | **20%** | scope-archaeology |
-| **10b** | 40 | **18%** | file-discovery |
-
-Two things to notice.
-
-First, the drop from the 27–32% band to the 16–20% band is real and it's held
-for three consecutive epics. That's the -11pp result.
-
-Second — and this is the part most agent-tuning posts don't tell you — **the
-dominant waste pattern changed between the two bands.** Early waste was
-`grep-storm` and `file-reread`: the agent re-reading files it already had and
-issuing broad searches with no file anchor. Late waste is `scope-archaeology`
-and `file-discovery`: calls spent confirming story boundaries, or
-one-time-orientation cost on new modules. That's qualitatively lower-severity
-waste. It's not sloppiness, it's a genuine "I don't know where this is yet."
-
-The numbers got better. The *kind* of waste got better too.
+*Waste % averaged across epic, QA agent only. Two things to notice. First,
+the drop from the 27–32% band to the 16–20% band is real, and it's held for
+three consecutive epics — that's the -11pp result. Second — and this is the
+part most agent-tuning posts don't tell you — the dominant waste pattern
+changed between the two bands. Early waste was `grep-storm` and `file-reread`:
+the agent re-reading files it already had and issuing broad searches with no
+file anchor. Late waste is `scope-archaeology` and `file-discovery`: calls
+spent confirming story boundaries, or one-time-orientation cost on new
+modules. That's qualitatively lower-severity waste — not sloppiness, a
+genuine "I don't know where this is yet." The numbers got better. The kind
+of waste got better too.*
 
 ## What I tried first (and why it didn't stick)
 
@@ -245,34 +238,21 @@ jobs.
 **But — and this is the honest part — the split didn't make waste go away.
 It relocated it.**
 
-Lint-mechanic's first six runs on Haiku:
+![Table of lint-mechanic's first six Haiku runs with calls, waste percentage, and the issue observed each run — ranging from 20% to 64% waste.](@/assets/images/lintMechanicRuns.png)
 
-| Run | Calls | Waste % | Issue |
-|-----|-------|---------|-------|
-| 1 | 6 | 33% | Ran `make lint` before editing |
-| 2 | 9 | 44% | Pre-fix scoping, grep-pipe |
-| 3 | 5 | 20% | Clean after Phase A/B split |
-| 4 | 6 | 50% | Used `tail -5` instead of prescribed `tail -20` |
-| 5 | 11 | **64%** | Dropped `tee` from pipe → re-ran lint 6 times |
-| 6 | 7 | 57% | Same tee-drop; WARNING block in command ignored |
-
-Haiku introduced its own failure class: dropping the middle segment of a
-3-part pipe (`cmd | tee file | tail` → `cmd | tail`). Without `tee`, no file
-to read, so the agent re-runs `make lint` to check the result — each time
-dropping `tee` again, each re-run making the budget worse. A `WARNING` block
-in the command file didn't fix it. What fixed it was moving the canonical
-command to the `Rules` section of the agent definition, because Haiku reads
-Rules proactively as a decision filter but reads process steps reactively
-during execution — by the time it reaches a step, it has already committed to
-a command form.
-
-One important caveat on that table: it's six runs. With n=6, a single bad
-run (like run 5 at 64% waste — driven by one pipe-simplification bug) pulls
-the average around hard. The tee-drop pattern is real and it recurred
-across three runs, but I wouldn't read the waste percentages as a trend.
-They're individual data points. lint-mechanic hasn't run enough times since
-the Rules-section fix for me to claim the fix is validated at qa-engineer's
-sample size.
+*Lint-mechanic's first six runs on Haiku. Haiku introduced its own failure
+class: dropping the middle segment of a 3-part pipe (`cmd | tee file | tail`
+→ `cmd | tail`). Without `tee`, no file to read, so the agent re-runs `make
+lint` to check the result — each time dropping `tee` again, each re-run
+making the budget worse. A `WARNING` block in the command file didn't fix
+it. What fixed it was moving the canonical command to the `Rules` section of
+the agent definition, because Haiku reads Rules proactively as a decision
+filter but reads process steps reactively during execution — by the time it
+reaches a step, it has already committed to a command form. One caveat on
+this table: n=6. A single bad run (run 5 at 64%, driven by one
+pipe-simplification bug) pulls the average around hard. The tee-drop pattern
+is real and recurred across three runs, but I wouldn't read these waste
+percentages as a trend — they're individual data points.*
 
 There's also a cost argument I stopped fighting. Haiku is cheap enough per
 call that lint-mechanic's absolute dollar waste is trivial even at 50%.
@@ -347,5 +327,6 @@ run.
 ---
 
 *Data for this post: 27 rows in `docs/agent-metrics/qa_runs.csv`, 8 waste
-pattern writeups in `~/.claude/agent-memory/agent-builder/pattern_*.md`.
-Running period: April 11–13, 2026. One orchestrator, one repo.*
+pattern writeups in `docs/agent-metrics/patterns/pattern_*.md`. Running
+period: April 11–13, 2026. One orchestrator, one repo. See
+[github.com/Burkswill2/QuantWorkstation](https://github.com/Burkswill2/QuantWorkstation).*
