@@ -374,4 +374,4 @@ measurement coverage reveals about the full-system picture.*
 *Data for this post: 27 rows in `docs/agent-metrics/qa_runs.csv`, 8 waste
 pattern writeups in `docs/agent-metrics/patterns/pattern_*.md`. Running
 period: April 11–13, 2026. One orchestrator, one repo. See
-[github.com/Burkswill2/QuantWorkstation](https://github.com/Burkswill2/QuantWorkstation).*
+[github.com/william-burks/QuantWorkstation](https://github.com/william-burks/QuantWorkstation).*
