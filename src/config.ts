@@ -14,7 +14,7 @@ export const SITE = {
   editPost: {
     enabled: false,
     text: "Edit page",
-    url: "https://github.com/Burkswill2/william-burks-dev/edit/main/",
+    url: "https://github.com/william-burks/william-burks-dev/edit/main/",
   },
   dynamicOgImage: true,
   dir: "ltr",

@@ -33,5 +33,5 @@ BS Molecular Genetics + CS minor, Ohio State (2024).
 ## Contact
 
 - Email: [will@william-burks.dev](mailto:will@william-burks.dev)
-- GitHub: [Burkswill2](https://github.com/Burkswill2)
+- GitHub: [william-burks](https://github.com/william-burks)
 - LinkedIn: [william-burks-ii](https://www.linkedin.com/in/william-burks-ii/)
