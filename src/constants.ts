@@ -38,7 +38,7 @@ export const SOCIALS: Social[] = [
   },
   {
     name: "Calendar",
-    href: "https://calendly.com/william-burks",
+    href: "/book",
     linkTitle: `Book a call with ${SITE.title}`,
     icon: IconCalendar,
   },
